@@ -82,6 +82,7 @@ public class PluginController{
 	private PluginSet remoteQueryPlugins = null;
     private final WebUIPluginManager webUI;
     private final DicooglePlatformProxy proxy;
+    private TaskManager taskManagerIndex = new TaskManager(Integer.parseInt(System.getProperty("dicoogle.taskManager.nIndexThreads", "4")));
     private TaskManager taskManager = new TaskManager(Integer.parseInt(System.getProperty("dicoogle.taskManager.nThreads", "4")));
     private TaskManager taskManagerQueries = new TaskManager(Integer.parseInt(System.getProperty("dicoogle.taskManager.nQueryThreads", "4")));
 
@@ -527,8 +528,10 @@ public class PluginController{
                         logger.info("Task [{}] complete: {} is indexed", taskUniqueID, pathF);
                     }
                 });
-
-                taskManager.dispatch(task);
+                if (indexer.getName().equals("lucene"))
+                    taskManager.dispatch(task);
+                else
+                    taskManagerIndex.dispatch(task);
                 rettasks.add(task);
                 RunningIndexTasks.getInstance().addTask(taskUniqueID, task);
             } catch (RuntimeException ex) {
@@ -569,7 +572,10 @@ public class PluginController{
                     }
                 });
 
-                taskManager.dispatch(task);
+                if (indexer.getName().equals("lucene"))
+                    taskManager.dispatch(task);
+                else
+                    taskManagerIndex.dispatch(task);
 
                 rettasks.add(task);
                 logger.info("Fired indexer {} for URI {}", pluginName, path.toString());
