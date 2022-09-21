@@ -5,6 +5,7 @@
     <artifactId>dicoogle-sdk</artifactId>
     <packaging>jar</packaging>
     <name>dicoogle-sdk</name>
+    <version>3.1.0</version>
     <url>https://www.dicoogle.com</url>
 
     <parent>
