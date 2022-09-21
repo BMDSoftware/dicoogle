@@ -20,13 +20,18 @@ package pt.ua.dicoogle.server;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.NotImplementedException;
 import org.dcm4che2.data.UID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pt.ua.dicoogle.core.settings.ServerSettingsManager;
+import pt.ua.dicoogle.sdk.datastructs.AdditionalSOPClass;
 import pt.ua.dicoogle.sdk.datastructs.SOPClass;
+import pt.ua.dicoogle.sdk.settings.server.ServerSettings;
 import pt.ua.dicoogle.server.web.management.SOPClassSettings;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Support class for keeping SOPClass/TransferSyntax association
@@ -44,91 +49,91 @@ public class SOPList {
     private Hashtable<String, TransfersStorage> table;
 
     private String[] SOP = {
-        UID.BasicStudyContentNotificationSOPClassRetired, 
-        UID.StoredPrintStorageSOPClassRetired,
-        UID.BasicStudyContentNotificationSOPClassRetired,
-        UID.StoredPrintStorageSOPClassRetired,
-        UID.HardcopyGrayscaleImageStorageSOPClassRetired,
-        UID.HardcopyColorImageStorageSOPClassRetired,
-        UID.ComputedRadiographyImageStorage,
-        UID.DigitalXRayImageStorageForPresentation,
-        UID.DigitalXRayImageStorageForProcessing,
-        UID.DigitalMammographyXRayImageStorageForPresentation,
-        UID.DigitalIntraOralXRayImageStorageForPresentation,
-        UID.DigitalIntraOralXRayImageStorageForProcessing,
-        UID.StandaloneModalityLUTStorageRetired,
-        UID.EncapsulatedPDFStorage,
-        UID.StandaloneVOILUTStorageRetired,
-        UID.GrayscaleSoftcopyPresentationStateStorageSOPClass,
-        UID.ColorSoftcopyPresentationStateStorageSOPClass,
-        UID.PseudoColorSoftcopyPresentationStateStorageSOPClass,
-        UID.BlendingSoftcopyPresentationStateStorageSOPClass,
-        UID.XRayAngiographicImageStorage,
-        UID.EnhancedXAImageStorage,
-        UID.XRayRadiofluoroscopicImageStorage,
-        UID.EnhancedXRFImageStorage,
-        UID.XRayAngiographicBiPlaneImageStorageRetired,
-        UID.PositronEmissionTomographyImageStorage,
-        UID.StandalonePETCurveStorageRetired,
-        UID.CTImageStorage,
-        UID.EnhancedCTImageStorage,
-        UID.NuclearMedicineImageStorage,
-        UID.UltrasoundMultiFrameImageStorageRetired,
-        UID.UltrasoundMultiFrameImageStorage,
-        UID.MRImageStorage,
-        UID.EnhancedMRImageStorage,
-        UID.MRSpectroscopyStorage,
-        UID.RTImageStorage,
-        UID.RTDoseStorage,
-        UID.RTStructureSetStorage,
-        UID.RTBeamsTreatmentRecordStorage,
-        UID.RTPlanStorage,
-        UID.RTBrachyTreatmentRecordStorage,
-        UID.RTTreatmentSummaryRecordStorage,
-        UID.NuclearMedicineImageStorageRetired,
-        UID.UltrasoundImageStorageRetired,
-        UID.UltrasoundImageStorage,
-        UID.RawDataStorage,
-        UID.SpatialRegistrationStorage,
-        UID.SpatialFiducialsStorage,
-        UID.RealWorldValueMappingStorage,
-        UID.SecondaryCaptureImageStorage,
-        UID.MultiFrameSingleBitSecondaryCaptureImageStorage,        
-        UID.MultiFrameGrayscaleByteSecondaryCaptureImageStorage,
-        UID.MultiFrameGrayscaleWordSecondaryCaptureImageStorage,
-        UID.MultiFrameTrueColorSecondaryCaptureImageStorage,
-        UID.VLImageStorageTrialRetired,
-        UID.VLEndoscopicImageStorage,
-        UID.VideoEndoscopicImageStorage,
-        UID.VLMicroscopicImageStorage,
-        UID.VideoMicroscopicImageStorage,
-        UID.VLSlideCoordinatesMicroscopicImageStorage,
-        UID.VLPhotographicImageStorage,
-        UID.VideoPhotographicImageStorage,
-        UID.OphthalmicPhotography8BitImageStorage,
-        UID.OphthalmicPhotography16BitImageStorage,
-        UID.StereometricRelationshipStorage,
-        UID.VLMultiFrameImageStorageTrialRetired,
-        UID.StandaloneOverlayStorageRetired,
-        UID.BasicTextSRStorage,
-        UID.EnhancedSRStorage,
-        UID.ComprehensiveSRStorage,
-        UID.ProcedureLogStorage,
-        UID.MammographyCADSRStorage,
-        UID.KeyObjectSelectionDocumentStorage,
-        UID.ChestCADSRStorage,
-        UID.StandaloneCurveStorageRetired,
-        //UID._12leadECGWaveformStorage,
-        UID.GeneralECGWaveformStorage,
-        UID.AmbulatoryECGWaveformStorage,
-        UID.HemodynamicWaveformStorage,
-        UID.CardiacElectrophysiologyWaveformStorage,
-        UID.BasicVoiceAudioWaveformStorage,
-        UID.HangingProtocolStorage,
-        UID.SiemensCSANonImageStorage,
-        UID.VLWholeSlideMicroscopyImageStorage,
-        UID.BreastTomosynthesisImageStorage,
-        UID.XRayRadiationDoseSRStorage
+            UID.BasicStudyContentNotificationSOPClassRetired,
+            UID.StoredPrintStorageSOPClassRetired,
+            UID.BasicStudyContentNotificationSOPClassRetired,
+            UID.StoredPrintStorageSOPClassRetired,
+            UID.HardcopyGrayscaleImageStorageSOPClassRetired,
+            UID.HardcopyColorImageStorageSOPClassRetired,
+            UID.ComputedRadiographyImageStorage,
+            UID.DigitalXRayImageStorageForPresentation,
+            UID.DigitalXRayImageStorageForProcessing,
+            UID.DigitalMammographyXRayImageStorageForPresentation,
+            UID.DigitalIntraOralXRayImageStorageForPresentation,
+            UID.DigitalIntraOralXRayImageStorageForProcessing,
+            UID.StandaloneModalityLUTStorageRetired,
+            UID.EncapsulatedPDFStorage,
+            UID.StandaloneVOILUTStorageRetired,
+            UID.GrayscaleSoftcopyPresentationStateStorageSOPClass,
+            UID.ColorSoftcopyPresentationStateStorageSOPClass,
+            UID.PseudoColorSoftcopyPresentationStateStorageSOPClass,
+            UID.BlendingSoftcopyPresentationStateStorageSOPClass,
+            UID.XRayAngiographicImageStorage,
+            UID.EnhancedXAImageStorage,
+            UID.XRayRadiofluoroscopicImageStorage,
+            UID.EnhancedXRFImageStorage,
+            UID.XRayAngiographicBiPlaneImageStorageRetired,
+            UID.PositronEmissionTomographyImageStorage,
+            UID.StandalonePETCurveStorageRetired,
+            UID.CTImageStorage,
+            UID.EnhancedCTImageStorage,
+            UID.NuclearMedicineImageStorage,
+            UID.UltrasoundMultiFrameImageStorageRetired,
+            UID.UltrasoundMultiFrameImageStorage,
+            UID.MRImageStorage,
+            UID.EnhancedMRImageStorage,
+            UID.MRSpectroscopyStorage,
+            UID.RTImageStorage,
+            UID.RTDoseStorage,
+            UID.RTStructureSetStorage,
+            UID.RTBeamsTreatmentRecordStorage,
+            UID.RTPlanStorage,
+            UID.RTBrachyTreatmentRecordStorage,
+            UID.RTTreatmentSummaryRecordStorage,
+            UID.NuclearMedicineImageStorageRetired,
+            UID.UltrasoundImageStorageRetired,
+            UID.UltrasoundImageStorage,
+            UID.RawDataStorage,
+            UID.SpatialRegistrationStorage,
+            UID.SpatialFiducialsStorage,
+            UID.RealWorldValueMappingStorage,
+            UID.SecondaryCaptureImageStorage,
+            UID.MultiFrameSingleBitSecondaryCaptureImageStorage,
+            UID.MultiFrameGrayscaleByteSecondaryCaptureImageStorage,
+            UID.MultiFrameGrayscaleWordSecondaryCaptureImageStorage,
+            UID.MultiFrameTrueColorSecondaryCaptureImageStorage,
+            UID.VLImageStorageTrialRetired,
+            UID.VLEndoscopicImageStorage,
+            UID.VideoEndoscopicImageStorage,
+            UID.VLMicroscopicImageStorage,
+            UID.VideoMicroscopicImageStorage,
+            UID.VLSlideCoordinatesMicroscopicImageStorage,
+            UID.VLPhotographicImageStorage,
+            UID.VideoPhotographicImageStorage,
+            UID.OphthalmicPhotography8BitImageStorage,
+            UID.OphthalmicPhotography16BitImageStorage,
+            UID.StereometricRelationshipStorage,
+            UID.VLMultiFrameImageStorageTrialRetired,
+            UID.StandaloneOverlayStorageRetired,
+            UID.BasicTextSRStorage,
+            UID.EnhancedSRStorage,
+            UID.ComprehensiveSRStorage,
+            UID.ProcedureLogStorage,
+            UID.MammographyCADSRStorage,
+            UID.KeyObjectSelectionDocumentStorage,
+            UID.ChestCADSRStorage,
+            UID.StandaloneCurveStorageRetired,
+            //UID._12leadECGWaveformStorage,
+            UID.GeneralECGWaveformStorage,
+            UID.AmbulatoryECGWaveformStorage,
+            UID.HemodynamicWaveformStorage,
+            UID.CardiacElectrophysiologyWaveformStorage,
+            UID.BasicVoiceAudioWaveformStorage,
+            UID.HangingProtocolStorage,
+            UID.SiemensCSANonImageStorage,
+            UID.VLWholeSlideMicroscopyImageStorage,
+            UID.BreastTomosynthesisImageStorage,
+            UID.XRayRadiationDoseSRStorage
     };
 
     public static synchronized SOPList getInstance() {
@@ -144,6 +149,7 @@ public class SOPList {
     private SOPList() {
         table = new Hashtable<>();
 
+        // Hardcoded (pre-#498) SOPs
         for (String sop : SOP) {
             table.put(sop, new TransfersStorage());
         }
@@ -208,7 +214,7 @@ public class SOPList {
 
 
     public int updateTSFieldByTsUID(String sopUID, String tsUID, boolean value) {
-        return updateTSField(sopUID, TransfersStorage.globalTransferUIDsMap.get(tsUID), value);
+        return updateTSField(sopUID, TransfersStorage.getGlobalTransferUIDsMap().get(tsUID), value);
     }
 
 
@@ -226,8 +232,8 @@ public class SOPList {
         TS = table.get(UID);
 
         int index = -1;
-        for (int i = 0; i < TransfersStorage.globalTransferMap.size(); i++) {
-            if (TransfersStorage.globalTransferMap.get(i).equals(name)) {
+        for (int i = 0; i < TransfersStorage.getGlobalTransferMap().size(); i++) {
+            if (TransfersStorage.getGlobalTransferMap().get(i).equals(name)) {
                 index = i;
                 break;
             }
@@ -334,7 +340,7 @@ public class SOPList {
             TransfersStorage ts = getTS(uid);
             for (int i = 0; i < ts.getTS().length; i++) {
                 JSONObject tsobj = new JSONObject();
-                String name = ts.globalTransferMap.get(i);
+                String name = TransfersStorage.getGlobalTransferMap().get(i);
                 boolean value = ts.getTS()[i];
                 tsobj.put("name", name);
                 tsobj.put("value", value);
@@ -356,4 +362,31 @@ public class SOPList {
         }
         return l;
     }
+
+    public void updateList() {
+
+        // Add the extras on SOP from getSettings()
+        ServerSettings settings = ServerSettingsManager.getSettings();
+        // Get all new SOP classes' UID (not existing in String[] SOP)
+        Collection<String> newSOPs = settings.getDicomServicesSettings().getAdditionalSOPClasses().stream()
+                .map(AdditionalSOPClass::getUid)
+                .filter(newSOPUID -> !Arrays.asList(SOP).contains(newSOPUID))
+                .collect(Collectors.toList());
+        // Refresh hardcoded SOPs (outdated TransfersStorage)
+        Arrays.asList(SOP).forEach(sop -> table.put(sop, new TransfersStorage()));
+        // Add "Additional" SOPs to table w/ default transfer syntaxes
+        newSOPs.forEach(sop -> {
+            TransfersStorage ts = new TransfersStorage();
+            ts.setDefaultSettings();
+            table.put(sop, ts);
+        });
+        // Add them to SOP
+        newSOPs.addAll(Arrays.asList(SOP));
+        SOP = newSOPs.toArray(new String[0]);
+    }
+
+    public void updateList(Collection<AdditionalSOPClass> additionalSOPClasses) {
+        additionalSOPClasses.forEach(elem -> table.put(elem.getUid(), new TransfersStorage()));
+    }
+
 }
