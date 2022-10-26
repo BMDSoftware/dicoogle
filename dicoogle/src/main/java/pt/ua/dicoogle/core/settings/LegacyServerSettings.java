@@ -1312,6 +1312,7 @@ public class LegacyServerSettings implements ServerSettings {
     @JsonAutoDetect(isGetterVisibility = JsonAutoDetect.Visibility.NONE,
             getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
     protected class StubDicomServices implements DicomServices {
+
         @Override
         public void setAETitle(String aetitle) {
             LegacyServerSettings.this.setAETitle(aetitle);
