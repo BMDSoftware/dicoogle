@@ -147,7 +147,6 @@ const AboutView = createReactClass({
               </a>
             </div>
           </div>
-          </div>
         </Panel>
       </div>
     );
