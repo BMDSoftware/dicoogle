@@ -56,10 +56,13 @@ public class CMoveServiceSCP extends CMoveService {
 
     private DicomNetwork service = null;
 
+    public CMoveServiceSCP(String[] sopClasses, Executor executor) {
+        super(sopClasses, executor);
+    }
+
     public CMoveServiceSCP(String sopClass, Executor executor) {
         super(sopClass, executor);
     }
-
 
     @Override
 

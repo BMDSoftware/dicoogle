@@ -105,7 +105,7 @@ public class CFindServiceSCP extends CFindService {
          * Search information at Lucene Indexer
          * So the FindRSP will fill the DimRSP
          */
-        replay = new FindRSP(keys, rsp, as.getCallingAET(), luke);
+        replay = new FindRSP(keys, rsp, as.getCallingAET());
 
 
         if (!superSpeed) {
