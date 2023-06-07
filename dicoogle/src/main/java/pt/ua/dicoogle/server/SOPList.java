@@ -334,6 +334,7 @@ public class SOPList {
                 JSONObject tsobj = new JSONObject();
                 String name = ts.globalTransferMap.get(i);
                 boolean value = ts.getTS()[i];
+                tsobj.put("uid", TransfersStorage.convertTsNameToUID(name));
                 tsobj.put("name", name);
                 tsobj.put("value", value);
 
