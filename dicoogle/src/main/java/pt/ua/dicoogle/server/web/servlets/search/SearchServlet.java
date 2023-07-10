@@ -41,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import pt.ua.dicoogle.core.QueryExpressionBuilder;
 import pt.ua.dicoogle.sdk.datastructs.dim.DIMGeneric;
+import pt.ua.dicoogle.sdk.datastructs.dim.DimLevel;
 import pt.ua.dicoogle.plugins.PluginController;
 import pt.ua.dicoogle.sdk.datastructs.SearchResult;
 import pt.ua.dicoogle.sdk.task.JointQueryTask;
@@ -62,8 +63,19 @@ public class SearchServlet extends HttpServlet {
             "SeriesInstanceUID", "PatientID", "PatientName", "PatientSex", "Modality", "StudyDate", "StudyID",
             "StudyDescription", "SeriesNumber", "SeriesDescription", "InstitutionName", "InstanceNumber");
 
+    private final Collection<String> DEFAULT_FIELDS_STUDY = Arrays.asList(
+            "StudyInstanceUID", "PatientID", "PatientName", "PatientSex", "ModalitiesInStudy",
+            "StudyDate", "StudyID", "StudyDescription", "InstitutionName");
+
     public enum SearchType {
-        ALL, PATIENT;
+        /** search by instances */
+        ALL,
+        /** search for patients, constructing a DIM tree */
+        DIM,
+        /** search for studies, without expanding them underneath.
+         * uses Dim level querying
+         */
+        STUDY;
     }
 
     private final SearchType searchType;
@@ -114,7 +126,7 @@ public class SearchServlet extends HttpServlet {
         }
         String paramDepth = request.getParameter("depth");
         if (paramDepth != null) {
-            if (this.searchType != SearchType.PATIENT) {
+            if (this.searchType != SearchType.DIM) {
                 sendError(response, 400, "Parameter depth is only applicable to /searchDIM endpoint");
                 return;
             }
@@ -199,8 +211,14 @@ public class SearchServlet extends HttpServlet {
         if (actualFields == null) {
 
             // attaches the required extrafields
-            for (String field : DEFAULT_FIELDS) {
-                extraFields.put(field, field);
+            if (this.searchType == SearchType.STUDY) {
+                for (String field : DEFAULT_FIELDS_STUDY) {
+                    extraFields.put(field, field);
+                }
+            } else {
+                for (String field : DEFAULT_FIELDS) {
+                    extraFields.put(field, field);
+                }
             }
         } else {
             for (String f : actualFields) {
@@ -219,10 +237,16 @@ public class SearchServlet extends HttpServlet {
 
         try {
             long elapsedTime = System.currentTimeMillis();
-            Iterable<SearchResult> results =
-                    PluginController.getInstance().query(queryTaskHolder, providerList, query, extraFields).get();
+            Iterable<SearchResult> results;
+            if (this.searchType == SearchType.STUDY) {
+                results = PluginController.getInstance()
+                        .query(queryTaskHolder, providerList, query, DimLevel.STUDY, extraFields).get();
+            } else {
+                results = PluginController.getInstance()
+                        .query(queryTaskHolder, providerList, query, extraFields).get();
+            }
 
-            if (this.searchType == SearchType.PATIENT) {
+            if (this.searchType == SearchType.DIM) {
                 try {
                     DIMGeneric dimModel = new DIMGeneric(ImmutableList.copyOf(results));
                     JSONObject obj = dimModel.getJSONObject(depth, offset, psize);
