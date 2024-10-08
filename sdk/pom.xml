@@ -5,13 +5,13 @@
     <artifactId>dicoogle-sdk</artifactId>
     <packaging>jar</packaging>
     <name>dicoogle-sdk</name>
-    <version>3.5.0-1-SNAPSHOT</version>
+    <version>3.5.0-2-SNAPSHOT</version>
     <url>https://www.dicoogle.com</url>
 
     <parent>
         <groupId>pt.ua.ieeta</groupId>
         <artifactId>dicoogle-all</artifactId>
-        <version>3.5.0-1-SNAPSHOT</version>
+        <version>3.5.0-2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
