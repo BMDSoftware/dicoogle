@@ -229,8 +229,7 @@ public class DicoogleWeb {
                 createServletHandler(new ListAllModelsServlet(), "/ml/model/list"),
                 createServletHandler(new ModelinfoServlet(), "/ml/model/info"),
                 createServletHandler(new CacheServlet(), "/ml/cache"),
-                createServletHandler(new ImplementedMethodsServlet(), "/ml/provider/methods"),
-                webpages};
+                createServletHandler(new ImplementedMethodsServlet(), "/ml/provider/methods"), webpages};
 
         // setup the server
         server = new Server(port);

@@ -799,7 +799,8 @@ public class PluginController {
      *         and whether some of them were not found in the database
      * @throws IOException
      */
-    public Task<UnindexReport> unindex(String indexProvider, Collection<URI> items, Consumer<Collection<URI>> progressCallback) throws IOException {
+    public Task<UnindexReport> unindex(String indexProvider, Collection<URI> items,
+            Consumer<Collection<URI>> progressCallback) throws IOException {
         logger.info("Starting unindexing procedure for {} items", items.size());
 
         IndexerInterface indexer = null;
@@ -879,7 +880,7 @@ public class PluginController {
      */
     public Task<MLInference> infer(final String provider, final MLInferenceRequest predictionRequest) {
         MLProviderInterface providerInterface = this.getMachineLearningProviderByName(provider, true);
-        if(providerInterface == null)
+        if (providerInterface == null)
             return null;
 
         String taskName = "MLPredictionTask" + UUID.randomUUID();
