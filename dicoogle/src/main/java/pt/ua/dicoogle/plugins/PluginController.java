@@ -413,7 +413,7 @@ public class PluginController {
     }
 
     /** Retrieve a storage interface capable of handling files on a given location.
-     * 
+     *
      * TODO: this can be heavily improved if we keep a map of scheme->indexer
      * However we are not supposed to call this every other cycle.
      *
@@ -442,7 +442,7 @@ public class PluginController {
     }
 
     /** Retrieve a storage interface capable of handling files with the given scheme.
-     * 
+     *
      * TODO: this can be heavily improved if we keep a map of scheme->indexer
      * However we are not supposed to call this every other cycle.
      *
@@ -808,7 +808,7 @@ public class PluginController {
     }
 
     /** Issue the removal of indexed entries in a path from the given indexers.
-     * 
+     *
      * @param path the URI of the directory or file to unindex
      * @param indexProviders a collection of providers
      */
@@ -827,7 +827,7 @@ public class PluginController {
     }
 
     /** Issue the removal of indexed entries in bulk.
-     * 
+     *
      * @param paths a collections of item identifiers to unindex
      * @param progressCallback an optional function (can be `null`),
      *        called for every batch of items successfully unindexed
@@ -873,7 +873,7 @@ public class PluginController {
     }
 
     /** Issue an unindexing procedure to the given indexers.
-     * 
+     *
      * @param path the URI of the directory or file to unindex
      * @param indexers a collection of providers
      */
@@ -1009,7 +1009,7 @@ public class PluginController {
     // Methods for Web UI
 
     /** Retrieve all web UI plugin descriptors for the given slot id.
-     * 
+     *
      * @param ids the slot id's for the plugin ("query", "result", "menu", ...), empty or null for any slot
      * @return a collection of web UI plugins.
      */
@@ -1032,7 +1032,7 @@ public class PluginController {
     }
 
     /** Retrieve the web UI plugin descriptor of the plugin with the given name.
-     * 
+     *
      * @param name the unique name of the plugin
      * @return a web UI plugin descriptor object, or null if no such plugin exists or is inactive
      */
