@@ -923,60 +923,6 @@ public class PluginController {
     }
 
     /**
-     * This method orders a prediction on the selected image, using the selected provider.
-     * @param provider provider to use.
-     * @param predictionRequest
-     * @return the created task
-     */
-    public Task<MLInference> infer(final String provider, final MLInferenceRequest predictionRequest) {
-        MLProviderInterface providerInterface = this.getMachineLearningProviderByName(provider, true);
-        if (providerInterface == null)
-            return null;
-
-        String taskName = "MLPredictionTask" + UUID.randomUUID();
-        Task<MLInference> result = providerInterface.infer(predictionRequest);
-        result.setName(taskName);
-        return result;
-    }
-
-    public Task<MLDataset> datastore(final DatastoreRequest datasetRequest) {
-        String uuid = UUID.randomUUID().toString();
-        Task<MLDataset> prepareTask =
-                new Task<>("MLPrepareDatastoreTask" + uuid, new PrepareDatastoreTask(this, datasetRequest));
-        MLProviderInterface mlInterface = getMachineLearningProviderByName(datasetRequest.getProvider(), true);
-        if (mlInterface == null) {
-            logger.error("MLProvider with name {} not found", datasetRequest.getProvider());
-            prepareTask.cancel(true);
-            return prepareTask;
-        }
-
-        prepareTask.onCompletion(() -> {
-            try {
-                mlInterface.dataStore(prepareTask.get());
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error("Task {} failed execution", prepareTask.getName(), e);
-            }
-        });
-        logger.debug("Fired prepare dataset task with uuid {}", uuid);
-        taskManagerML.dispatch(prepareTask);
-        return prepareTask;
-    }
-
-    public Task<Boolean> cache(String provider, final MLDicomDataset dataset) {
-        String taskName = "MLPredictionTask" + UUID.randomUUID();
-        MLProviderInterface mlInterface = getMachineLearningProviderByName(provider, true);
-        if (mlInterface == null) {
-            logger.error("MLProvider with name {} not found", provider);
-            return null;
-        }
-
-        Task<Boolean> task = mlInterface.cache(dataset);
-        task.setName(taskName);
-        return task;
-    }
-
-
-    /**
      * Generate and dispatch an unindex task.
      * @param items Collection of URIs to unindex
      * @param progressCallback Callback raised when URIs are declared
@@ -1005,6 +951,71 @@ public class PluginController {
         return task;
     }
 
+    /**
+     * This method orders a prediction on the selected image, using the selected provider.
+     * @param provider provider to use.
+     * @param predictionRequest
+     * @return the created task
+     */
+    public Task<MLInference> infer(final String provider, final MLInferenceRequest predictionRequest) {
+        MLProviderInterface providerInterface = this.getMachineLearningProviderByName(provider, true);
+        if (providerInterface == null)
+            return null;
+
+        String taskName = "MLPredictionTask" + UUID.randomUUID();
+        Task<MLInference> result = providerInterface.infer(predictionRequest);
+        result.setName(taskName);
+        return result;
+    }
+
+    /**
+     * This method creates a {@link PrepareDatasetTask}.
+     * The task is responsible for creating a directory where the processed dataset will be placed.
+     * After the task is finished, the chosen mlProvider will be invoked to upload the dataset.
+     * @param datasetRequest the dataset to upload.
+     * @return the created task
+     */
+    public Task<MLDataset> datastore(final DatastoreRequest datasetRequest) {
+        String uuid = UUID.randomUUID().toString();
+        Task<MLDataset> prepareTask =
+                new Task<>("MLPrepareDatastoreTask" + uuid, new PrepareDatastoreTask(this, datasetRequest));
+        MLProviderInterface mlInterface = getMachineLearningProviderByName(datasetRequest.getProvider(), true);
+        if (mlInterface == null) {
+            logger.error("MLProvider with name {} not found", datasetRequest.getProvider());
+            prepareTask.cancel(true);
+            return prepareTask;
+        }
+
+        prepareTask.onCompletion(() -> {
+            try {
+                mlInterface.dataStore(prepareTask.get());
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Task {} failed execution", prepareTask.getName(), e);
+            }
+        });
+        logger.debug("Fired prepare dataset task with uuid {}", uuid);
+        taskManagerML.dispatch(prepareTask);
+        return prepareTask;
+    }
+
+    /** Upload a dataset to the local cache of a machine learning provider.
+     *
+     * @param provider the name of the machine learning provider
+     * @param dataset the dataset to upload
+     * @return a task representing the upload operation
+     */
+    public Task<Boolean> cache(String provider, final MLDicomDataset dataset) {
+        String taskName = "MLPredictionTask" + UUID.randomUUID();
+        MLProviderInterface mlInterface = getMachineLearningProviderByName(provider, true);
+        if (mlInterface == null) {
+            logger.error("MLProvider with name {} not found", provider);
+            return null;
+        }
+
+        Task<Boolean> task = mlInterface.cache(dataset);
+        task.setName(taskName);
+        return task;
+    }
 
     // Methods for Web UI
 
