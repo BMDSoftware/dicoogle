@@ -86,19 +86,19 @@
                     <include>webapp/dist/**</include>
                     <include>webapp/index.html</include>
                     <!-- dicoogle-next -->
-                    <include>dicoogle-next/dist/**</include>
+                    <include>dicoogle-next/webapp/dist/**</include>
                 </includes>
                 <excludes>
                     <exclude>META-INF/*.SF</exclude>
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
                 <!-- Exclude dicoogle-next source files (only include dist) -->
-                    <exclude>dicoogle-next/src/**</exclude>
-                    <exclude>dicoogle-next/node_modules/**</exclude>
-                    <exclude>dicoogle-next/vite-plugins/**</exclude>
-                    <exclude>dicoogle-next/docs/**</exclude>
-                    <exclude>dicoogle-next/*.json</exclude>
-                    <exclude>dicoogle-next/*.ts</exclude>
+                    <exclude>dicoogle-next/webapp/src/**</exclude>
+                    <exclude>dicoogle-next/webapp/node_modules/**</exclude>
+                    <exclude>dicoogle-next/webapp/vite-plugins/**</exclude>
+                    <exclude>dicoogle-next/webapp/docs/**</exclude>
+                    <exclude>dicoogle-next/webapp/*.json</exclude>
+                    <exclude>dicoogle-next/webapp/*.ts</exclude>
                 </excludes>
             </resource>
 
@@ -338,7 +338,7 @@
                             <nodeVersion>v20.11.0</nodeVersion>
                             <npmVersion>10.2.4</npmVersion>
                             <installDirectory>target</installDirectory>
-                            <workingDirectory>src/main/resources/dicoogle-next</workingDirectory>
+                            <workingDirectory>src/main/resources/dicoogle-next/webapp</workingDirectory>
                         </configuration>
                     </execution>
                     
@@ -350,7 +350,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <workingDirectory>src/main/resources/dicoogle-next</workingDirectory>
+                            <workingDirectory>src/main/resources/dicoogle-next/webapp</workingDirectory>
                             <arguments>install --no-audit</arguments>
                         </configuration>
                     </execution>
@@ -363,7 +363,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <workingDirectory>src/main/resources/dicoogle-next</workingDirectory>
+                            <workingDirectory>src/main/resources/dicoogle-next/webapp</workingDirectory>
                             <arguments>run build</arguments>
                         </configuration>
                     </execution>

@@ -19,13 +19,16 @@
 
 package pt.ua.dicoogle.server.web.servlets;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * Servlet to serve the experimental dicoogle-next webapp
@@ -42,8 +45,8 @@ public class DicoogleNextWebAppServlet extends HttpServlet {
             path = "/index.html";
         }
 
-        // Try to serve from /dicoogle-next/dist/ first
-        String resourcePath = "/dicoogle-next/dist" + path;
+        // Try to serve from /dicoogle-next/webapp/dist/ first
+        String resourcePath = "/dicoogle-next/webapp/dist" + path;
         InputStream is = getClass().getResourceAsStream(resourcePath);
 
         // If it's a file request (has extension) and not found, it's a 404
@@ -55,7 +58,7 @@ public class DicoogleNextWebAppServlet extends HttpServlet {
                 return;
             } else {
                 // Fallback to index.html for client-side routing
-                resourcePath = "/dicoogle-next/dist/index.html";
+                resourcePath = "/dicoogle-next/webapp/dist/index.html";
                 is = getClass().getResourceAsStream(resourcePath);
             }
         }
@@ -69,7 +72,7 @@ public class DicoogleNextWebAppServlet extends HttpServlet {
         String contentType = getServletContext().getMimeType(path);
         if (contentType == null) {
             if (path.endsWith(".js")) {
-                contentType = "application/javascript";
+                contentType = "text/javascript";
             } else if (path.endsWith(".css")) {
                 contentType = "text/css";
             } else if (path.endsWith(".html")) {
@@ -101,11 +104,7 @@ public class DicoogleNextWebAppServlet extends HttpServlet {
 
         // Stream response
         try (InputStream in = is; OutputStream out = resp.getOutputStream()) {
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
+            IOUtils.copy(in, out);
         }
     }
 }
