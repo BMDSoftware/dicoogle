@@ -18,12 +18,13 @@
  */
 package pt.ua.dicoogle.server;
 
-import pt.ua.dicoogle.core.settings.ServerSettingsManager;
-
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.dcm4che2.data.DicomObject;
@@ -34,9 +35,6 @@ import org.dcm4che2.net.Association;
 import org.dcm4che2.net.CommandUtils;
 import org.dcm4che2.net.Device;
 import org.dcm4che2.net.DicomServiceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.dcm4che2.net.NetworkApplicationEntity;
 import org.dcm4che2.net.NetworkConnection;
 import org.dcm4che2.net.NewThreadExecutor;
@@ -45,8 +43,10 @@ import org.dcm4che2.net.Status;
 import org.dcm4che2.net.TransferCapability;
 import org.dcm4che2.net.service.StorageService;
 import org.dcm4che2.net.service.VerificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
+import pt.ua.dicoogle.core.settings.ServerSettingsManager;
 import pt.ua.dicoogle.plugins.PluginController;
 import pt.ua.dicoogle.sdk.StorageInterface;
 import pt.ua.dicoogle.sdk.settings.server.ServerSettings;
@@ -291,17 +291,45 @@ public class DicomStorage extends StorageService {
 
             Iterable<StorageInterface> plugins = PluginController.getInstance().getStoragePlugins(true);
 
+            int success = 0;
+            int failures = 0;
             for (StorageInterface storage : plugins) {
-                URI uri = storage.store(d);
+                // skip built-in default filesystem storage plugin,
+                // as it does not suport item store
+                if ("default-filesystem-plugin".equals(storage.getName())) {
+                    continue;
+                }
+
+                URI uri;
+                try {
+                    uri = storage.store(d);
+                } catch (RuntimeException ex) {
+                    LOG.error("Failed to store DICOM object {} onto {}", iuid, storage.getName(), ex);
+                    failures += 1;
+                    continue;
+                }
+
                 if (uri != null) {
                     // enqueue to index
                     ImageElement element = new ImageElement(uri, as.getCallingAET(), seqNum.getAndIncrement());
                     IndexQueueWorker.getInstance().addElement(element);
+                    success += 1;
+                } else {
+                    LOG.error("Failed to store DICOM object {} onto {}: null URI", iuid, storage.getName());
+                    failures += 1;
                 }
             }
 
+            if (success == 0 && failures == 0) {
+                throw new DicomServiceException(rq, Status.ProcessingFailure, "No storage provider available");
+            } else if (success == 0) {
+                throw new DicomServiceException(rq, Status.ProcessingFailure, "Failed to store DICOM object");
+            }
+
+        } catch (DicomServiceException e) {
+            throw e;
         } catch (Exception e) {
-            LOG.error("DICOM storage service failure:", e);
+            LOG.error("DICOM storage service failure", e);
             throw new DicomServiceException(rq, Status.ProcessingFailure, e.getMessage());
         }
     }
