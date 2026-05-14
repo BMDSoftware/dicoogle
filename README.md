@@ -83,6 +83,11 @@ Brief Documentation
 
       After running a query, the result browser shows up, giving the user an intuitive hierarchical view of the results. On this page, there is also an Export button, which is used in order to export the query results into a CSV file. When the export button is clicked, the user has to select which tags (s)he wants to export in the CSV file. This selection is heavily assisted by the interface, on which the user may type an incomplete tag and have presented the available candidates that match the inserted term. Moreover, the text box allows users to copy a list of tags directly from another CSV file, enabling an easier generation of reports.
 
+    - Using dicoogle-next interface
+
+      Dicoogle now features **dicoogle-next**, a web application that runs alongside the current gebapp. This interface offers a refreshed design and updated workflows.
+      You can access this interface by navigating to the `/experimental` path on your server (e.g., `http://localhost:8080/experimental`).
+
 #### Using the Web Services
 
   Let us assume that the Web Services for our instance of Dicoogle are running in https://demo.dicoogle.com/
@@ -150,6 +155,19 @@ Before building, please make sure that your system contains the following tools:
  - Maven 3;
 
  1. Retrieve the full source code from this repository: `git clone https://github.com/bioinformatics-ua/dicoogle.git`
+
+- Note
+  - Initialize the dicoogle-next submodule:
+
+```bash
+    git submodule update --init
+```
+
+- Update the submodule to fetch the latest version of the dicoogle-next web application:
+
+```bash
+    git submodule update --remote --recursive
+```
  2. Navigate to the project's base directory, and build the parent Maven project by calling `mvn install`.
     - Note: this will build the web application using an embedded version of Node.js and npm. To skip building the webapp: `mvn install -Dskip.installnodenpm -Dskip.npm`
  3. The resulting jar file can be found in "./dicoogle/target".

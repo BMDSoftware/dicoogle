@@ -1,0 +1,4 @@
+[submodule "dicoogle/src/main/resources/dicoogle-next"]
+	path = dicoogle/src/main/resources/dicoogle-next
+	url = git@github.com:dicoogle/dicoogle-next.git
+	branch = main
