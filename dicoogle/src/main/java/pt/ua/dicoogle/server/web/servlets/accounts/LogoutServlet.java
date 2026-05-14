@@ -21,9 +21,12 @@ package pt.ua.dicoogle.server.web.servlets.accounts;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import pt.ua.dicoogle.server.web.auth.AuthenticatedFilter;
 import pt.ua.dicoogle.server.web.auth.Authentication;
 import pt.ua.dicoogle.server.web.auth.Session;
 import pt.ua.dicoogle.server.web.utils.ResponseUtil;
@@ -34,8 +37,6 @@ import pt.ua.dicoogle.server.web.utils.ResponseUtil;
  */
 public class LogoutServlet extends HttpServlet {
 
-    private static final String TOKEN_HEADERNAME = "Authorization";
-
     @Deprecated
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,11 +46,15 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         boolean logout = Session.logout(req);
-        String token = req.getHeader(TOKEN_HEADERNAME);
-        if (token != null && !token.equals("")) {
+        String token = AuthenticatedFilter.getTokenFromRequest(req);
+        if (token != null && !token.isEmpty()) {
             Authentication.getInstance().logout(token);
         }
+        // delete existing session cookie
+        Cookie cookie = new Cookie(AuthenticatedFilter.DICOOGLE_SESSION_COOKIE_NAME, "");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        resp.addCookie(cookie);
         ResponseUtil.simpleResponse(resp, "success", logout);
     }
-
 }

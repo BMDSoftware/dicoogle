@@ -82,8 +82,7 @@ public class WebUIServlet extends HttpServlet {
 
     /** Retrieve plugins. */
     private String getPluginsBySlot(HttpServletRequest req, String... slotIds) throws IOException {
-        String token = req.getHeader("Authorization");
-        User user = Authentication.getInstance().getUsername(token);
+        User user = Authentication.getInstance().getAuthenticatedUser(req);
 
         Collection<WebUIPlugin> plugins = PluginController.getInstance().getWebUIPlugins(slotIds);
         List<String> pkgList = new ArrayList<>(plugins.size());

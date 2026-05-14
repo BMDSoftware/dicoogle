@@ -22,6 +22,7 @@ package pt.ua.dicoogle.server.web.servlets.accounts;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,7 @@ import net.sf.json.JSONObject;
 import pt.ua.dicoogle.server.users.Role;
 import pt.ua.dicoogle.server.users.User;
 import pt.ua.dicoogle.server.users.UsersStruct;
+import pt.ua.dicoogle.server.web.auth.AuthenticatedFilter;
 import pt.ua.dicoogle.server.web.auth.Authentication;
 import pt.ua.dicoogle.server.web.auth.LoggedIn;
 import pt.ua.dicoogle.server.web.auth.LoggedInStatus;
@@ -68,6 +70,11 @@ public class LoginServlet extends HttpServlet {
         }
         json_resp.put("token", mLoggedIn.getToken());
 
+        // Add session cookie
+        Cookie cookie = new Cookie(AuthenticatedFilter.DICOOGLE_SESSION_COOKIE_NAME, mLoggedIn.getToken());
+        cookie.setHttpOnly(true);
+        resp.addCookie(cookie);
+
         // Set response content type
         resp.setContentType("application/json");
 
@@ -78,8 +85,8 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String token = req.getHeader("Authorization");
-        User user = Authentication.getInstance().getUsername(token);
+        // Find authenticated user
+        User user = Authentication.getInstance().getAuthenticatedUser(req);
 
         if (user == null) {
             resp.sendError(401);

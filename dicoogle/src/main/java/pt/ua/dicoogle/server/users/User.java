@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import pt.ua.dicoogle.sdk.datastructs.DicoogleUser;
+
 /**
  * Class that saves information about one user
  *
@@ -167,5 +169,16 @@ public class User implements UserRoleManager {
 
     public List<Role> getRoles() {
         return roles;
+    }
+
+    /** Create a simple user record for sharing through the SDK */
+    public DicoogleUser toDicoogleUser() {
+        return new DicoogleUser(
+            this.username,
+            this.admin,
+            this.roles.stream()
+                .map(Role::getName)
+                .collect(java.util.stream.Collectors.toSet())
+        );
     }
 }

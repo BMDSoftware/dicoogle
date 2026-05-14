@@ -46,8 +46,7 @@ public class PresetsServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String token = req.getHeader("Authorization");
-        User user = Authentication.getInstance().getUsername(token);
+        User user = Authentication.getInstance().getAuthenticatedUser(req);
         if (user == null) {
             ResponseUtil.sendError(resp, 401, "Unauthorized access to this user.");
             return;
@@ -81,8 +80,7 @@ public class PresetsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String token = req.getHeader("Authorization");
-        User user = Authentication.getInstance().getUsername(token);
+        User user = Authentication.getInstance().getAuthenticatedUser(req);
         if (user == null) {
             ResponseUtil.sendError(resp, 401, "Unauthorized access to this user.");
             return;

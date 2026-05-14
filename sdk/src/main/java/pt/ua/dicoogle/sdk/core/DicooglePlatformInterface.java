@@ -27,6 +27,7 @@ import pt.ua.dicoogle.sdk.IndexerInterface;
 import pt.ua.dicoogle.sdk.QueryInterface;
 import pt.ua.dicoogle.sdk.StorageInputStream;
 import pt.ua.dicoogle.sdk.StorageInterface;
+import pt.ua.dicoogle.sdk.datastructs.DicoogleUser;
 import pt.ua.dicoogle.sdk.datastructs.Report;
 import pt.ua.dicoogle.sdk.datastructs.SearchResult;
 import pt.ua.dicoogle.sdk.datastructs.UnindexReport;
@@ -254,4 +255,18 @@ public interface DicooglePlatformInterface {
      * @return an object for read-only access to the settings
      */
     ServerSettingsReader getSettings();
+
+    /** Retrieve the user authenticated in the given request.
+     *
+     * @param token a dicoogle user session token
+     * @return a user descriptor, or {@code null} if the request is not authenticated
+     */
+    DicoogleUser getUser(String token);
+
+    /** Retrieve the user authenticated in the given request.
+     *
+     * @param request a servlet request
+     * @return a user descriptor, or {@code null} if the request is not authenticated
+     */
+    DicoogleUser getUser(org.eclipse.jetty.server.Request request);
 }

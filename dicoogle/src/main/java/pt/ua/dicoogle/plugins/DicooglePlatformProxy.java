@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.eclipse.jetty.server.Request;
+
 import pt.ua.dicoogle.core.settings.ServerSettingsManager;
 
 
@@ -31,6 +33,7 @@ import pt.ua.dicoogle.sdk.QueryInterface;
 import pt.ua.dicoogle.sdk.StorageInputStream;
 import pt.ua.dicoogle.sdk.StorageInterface;
 import pt.ua.dicoogle.sdk.core.DicooglePlatformInterface;
+import pt.ua.dicoogle.sdk.datastructs.DicoogleUser;
 import pt.ua.dicoogle.sdk.datastructs.Report;
 import pt.ua.dicoogle.sdk.datastructs.SearchResult;
 import pt.ua.dicoogle.sdk.datastructs.UnindexReport;
@@ -38,6 +41,8 @@ import pt.ua.dicoogle.sdk.datastructs.dim.DimLevel;
 import pt.ua.dicoogle.sdk.settings.server.ServerSettingsReader;
 import pt.ua.dicoogle.sdk.task.JointQueryTask;
 import pt.ua.dicoogle.sdk.task.Task;
+import pt.ua.dicoogle.server.users.User;
+import pt.ua.dicoogle.server.web.auth.Authentication;
 
 /**
  * A proxy to the implementations of Plugin Controller.
@@ -192,4 +197,23 @@ public class DicooglePlatformProxy implements DicooglePlatformInterface {
         return ServerSettingsManager.getSettings();
     }
 
+    @Override
+    public DicoogleUser getUser(String token) {
+        User user = Authentication.getInstance().getUsername(token);
+        if (user == null) {
+            return null;
+        }
+
+        return user.toDicoogleUser();
+    }
+
+    @Override
+    public DicoogleUser getUser(Request request) {
+        User user = Authentication.getInstance().getAuthenticatedUser(request);
+        if (user == null) {
+            return null;
+        }
+        
+        return user.toDicoogleUser();
+    }
 }

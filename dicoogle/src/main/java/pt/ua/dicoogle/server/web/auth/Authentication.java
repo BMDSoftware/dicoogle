@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.ServletRequest;
+
 /**
  * Provides login routines for users.
  *
@@ -57,7 +59,37 @@ public class Authentication {
         return instance;
     }
 
+    /** Obtain the user object of the user logged in according to the given request.
+     *
+     * If the servlet request object already contains the user in attribute `USER_ATTRIBUTE`,
+     * the same object is returned.
+     *
+     * Otherwise, the user is obtained from the session token provided in the request.
+     */
+    public User getAuthenticatedUser(ServletRequest request) {
+        User user = (User) request.getAttribute(AuthenticatedFilter.USER_ATTRIBUTE);
+        if (user != null) {
+            return user;
+        }
 
+        String token = AuthenticatedFilter.getTokenFromRequest(request);
+        if (token == null) {
+            return null;
+        }
+
+        user = Authentication.getInstance().getUsername(token);
+
+        // save the user for future use
+        if (user != null) {
+            request.setAttribute(AuthenticatedFilter.USER_ATTRIBUTE, user);
+        }
+
+        return user;
+    }
+
+    /** Obtain the user object of the user associated with
+     * the given session token
+     */
     public User getUsername(String token) {
         String user = tokenUsers.get(token);
         if (user == null)

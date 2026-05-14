@@ -164,4 +164,14 @@ public class PlatformInterfaceMock implements DicooglePlatformInterface {
     public StorageInterface getStorageForSchema(String scheme) {
         return null;
     }
+
+    @Override
+    public pt.ua.dicoogle.sdk.datastructs.DicoogleUser getUser(String token) {
+        return null;
+    }
+
+    @Override
+    public pt.ua.dicoogle.sdk.datastructs.DicoogleUser getUser(org.eclipse.jetty.server.Request request) {
+        return null;
+    }
 }

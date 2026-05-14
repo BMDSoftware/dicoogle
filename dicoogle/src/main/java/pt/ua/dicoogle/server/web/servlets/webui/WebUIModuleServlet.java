@@ -90,8 +90,10 @@ public class WebUIModuleServlet extends HttpServlet {
         if (process) {
             writer.append("(function(r,f){\n");
             writer.append("var w=r.DicoogleWebcore||require(\"dicoogle-webcore\");");
-            writer.append("if (w.__esModule)w=w.default;");
-            writer.append("var c=(r.Dicoogle||require(\"dicoogle-client\"))();");
+            writer.append("if(w.__esModule)w=w.default;");
+            writer.append("var d=r.Dicoogle||require(\"dicoogle-client\");");
+            writer.append("if(d.__esModule)d=d.default;");
+            writer.append("var c=d();");
             writer.append("var m={exports:{}};");
             writer.append("f(c,m,m.exports);");
             writer.append("var o=m.exports.__esModule?m.exports.default:m.exports;");
