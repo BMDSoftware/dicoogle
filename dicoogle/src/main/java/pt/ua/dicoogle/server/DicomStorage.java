@@ -326,8 +326,10 @@ public class DicomStorage extends StorageService {
                 throw new DicomServiceException(rq, Status.ProcessingFailure, "Failed to store DICOM object");
             }
 
+        } catch (DicomServiceException e) {
+            throw e;
         } catch (Exception e) {
-            LOG.error("DICOM storage service failure:", e);
+            LOG.error("DICOM storage service failure", e);
             throw new DicomServiceException(rq, Status.ProcessingFailure, e.getMessage());
         }
     }
