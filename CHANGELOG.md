@@ -1,6 +1,18 @@
 # CHANGELOG
 This document intends to keep track of the changes performed on the various releases of Dicoogle.
 
+## 3.6
+
+### 3.6.0 (2026-05-18)
+
+* Change: All built-in Dicoogle Web services are now behind access control, requiring the user to be logged in and to be an administrator in some cases. Disabling this is not recommended, but it is possible through server setting `web.allow-unauthorized`. (#740)
+* New: A new webapp for Dicoogle is now available at the path `/experimental`. This UI is retrieved from the [dicoogle-next] repository, which is temporarily hosting the next generation of Dicoogle. (#749)
+* Enhancement: DICOM data storage failures are now detect and reported in the DIMSE storage service (#750)
+* Enhancement (webui change): Update dicoogle-client in webapp to v6 (#738)
+* Chore: Adjust WebUIPluginManager and WebUIPluginTest for test reliability (#748)
+
+[dicoogle-next]: https://github.com/dicoogle/dicoogle-next
+
 ## 3.5
 
 ### 3.5.1 (2025-12-03)
